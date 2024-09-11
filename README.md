@@ -20,6 +20,6 @@ A simple assembly language program that prompts the user for input, manipulates 
 
 ---
 
-#### Was your program's EXE file blocked by an Antivirus scanner?
+#### Was the program's EXE file blocked by an Antivirus scanner?
 [See this Note](https://www.asmirvine.com/gettingStartedVS2019/index.htm#BlockedPrograms)
 from **'Assembly Language for x86 Processors, 8th Edition'** *by Kip Irvine*
