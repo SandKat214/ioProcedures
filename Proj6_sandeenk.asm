@@ -39,17 +39,17 @@ mGetString MACRO promptAddr:REQ, inAddr:REQ, inLen:REQ, outLen:REQ
 	mDisplayString	promptAddr
 
 	; read the input
-	MOV		EDX, inAddr
-	MOV		ECX, inLen
-	MOV		EDI, outLen
+	MOV	EDX, inAddr
+	MOV	ECX, inLen
+	MOV	EDI, outLen
 	CALL	ReadString
-	MOV		[EDI], EAX
+	MOV	[EDI], EAX
 
 	; restore registers
-	POP		EAX
-	POP		ECX
-	POP		EDX
-	POP		EDI
+	POP	EAX
+	POP	ECX
+	POP	EDX
+	POP	EDI
 ENDM
 
 
@@ -69,13 +69,13 @@ ENDM
 ; ----------------------------------------------------------------------------------
 mDisplayString MACRO strOffset:REQ
 	PUSH	EDX							; save used register
-	MOV		EDX, strOffset
+	MOV	EDX, strOffset
 	CALL	WriteString
-	POP		EDX							; restore register
+	POP	EDX							; restore register
 ENDM
 
 
-STR_SIZE = 13							; 10 digits + sign symbol + null + 1
+STR_SIZE = 13								; 10 digits + sign symbol + null + 1
 NUM_ARR_SIZE = 10
 
 
@@ -89,12 +89,12 @@ sum			SDWORD	0
 
 ; string storage
 intro		BYTE	"Welcome to 'Using Low-Level I/O Procedures with Macros'... by Katie Sandeen",13,10,13,10,
-					"Please input 10 signed integers, between -2,147,483,648 & 2,147,483,647, inclusive...",13,10,
-					"Then I will display the integers, their total sum, and their avergage truncated value.",13,10,13,10,0
+			"Please input 10 signed integers, between -2,147,483,648 & 2,147,483,647, inclusive...",13,10,
+			"Then I will display the integers, their total sum, and their avergage truncated value.",13,10,13,10,0
 outro		BYTE	13,10,13,10,"That's all for this program. Goodbye, until next time...",13,10,0
 inPrompt	BYTE	"Enter a signed integer: ",0
 error		BYTE	"Invalid input, not a signed number or number was too big.",13,10,
-					"Please try again: ",0
+			"Please try again: ",0
 listHeader	BYTE	13,10,"Here are your numbers:",13,10,0
 separator	BYTE	", ",0
 sumHeader	BYTE	13,10,13,10,"The sum of your numbers is: ",0
@@ -112,8 +112,8 @@ main PROC
 	; Get valid integers from the user.
 	; ------------------------------------
 	; loop preliminaries
-	MOV		ECX, NUM_ARR_SIZE
-	MOV		EDI, OFFSET numArray
+	MOV	ECX, NUM_ARR_SIZE
+	MOV	EDI, OFFSET numArray
 	CLD
 
 _collectLoop:
@@ -127,7 +127,7 @@ _collectLoop:
 	CALL	ReadVal
 
 	; store numeric value in storage array
-	MOV		EAX, validNum
+	MOV	EAX, validNum
 	STOSD
 	LOOP	_collectLoop
 
@@ -136,8 +136,8 @@ _collectLoop:
 	; ---------------------------------
 	mDisplayString	OFFSET listHeader
 	; loop preliminaries
-	MOV		ECX, NUM_ARR_SIZE
-	MOV		ESI, OFFSET numArray
+	MOV	ECX, NUM_ARR_SIZE
+	MOV	ESI, OFFSET numArray
 	CLD
 
 _displayLoop:
@@ -145,8 +145,8 @@ _displayLoop:
 	; WriteVal stack frame
 	PUSH	EAX
 	CALL	WriteVal
-	CMP		ECX, 1
-	JZ		_displaySum
+	CMP	ECX, 1
+	JZ	_displaySum
 	mDisplayString	OFFSET separator
 	LOOP	_displayLoop
 
@@ -170,8 +170,8 @@ _displaySum:
 	; Display their truncated average
 	; ----------------------------------
 	; calculate average
-	MOV		EBX, NUM_ARR_SIZE
-	MOV		EAX, sum
+	MOV	EBX, NUM_ARR_SIZE
+	MOV	EAX, sum
 	CDQ
 	IDIV	EBX
 
@@ -227,77 +227,77 @@ ReadVal PROC
 
 _validLoop:
 	; check if length too long
-	MOV		ESI, [EBP+12]
-	MOV		ECX, [ESI]
-	CMP		ECX, 0
-	JZ		_error
+	MOV	ESI, [EBP+12]
+	MOV	ECX, [ESI]
+	CMP	ECX, 0
+	JZ	_error
 
 	; convert string to numeric value
-	MOV		sign, '+'
-	MOV		ESI, [EBP+20]
-	MOV		EBX, 0
+	MOV	sign, '+'
+	MOV	ESI, [EBP+20]
+	MOV	EBX, 0
 	CLD
-	XOR		EAX, EAX
+	XOR	EAX, EAX
 	LODSB
 
 	; check for a sign character at the front
-	CMP		AL, '+'
-	JNZ		_checkNeg
+	CMP	AL, '+'
+	JNZ	_checkNeg
 	LODSB
-	DEC		ECX
+	DEC	ECX
 _checkNeg:
-	CMP		AL, '-'
-	JNZ		_convertLoop
-	MOV		sign, AL
+	CMP	AL, '-'
+	JNZ	_convertLoop
+	MOV	sign, AL
 	LODSB
-	DEC		ECX
+	DEC	ECX
 
 	; validate as a number
 _convertLoop:
-	CMP		AL, 48
-	JB		_error
-	CMP		AL, 57
-	JA		_error
+	CMP	AL, 48
+	JB	_error
+	CMP	AL, 57
+	JA	_error
 
 	; keep a tally of the converted digits,
 	IMUL	EBX, 10
-	JO		_error
-	SUB		AL, 48
+	JO	_error
+	SUB	AL, 48
 
 	; subtract if negative
-	CMP		sign, '-'
-	JNZ		_add
-	SUB		EBX, EAX
-	JO		_error
-	JMP		_nextChar
+	CMP	sign, '-'
+	JNZ	_add
+	SUB	EBX, EAX
+	JO	_error
+	JMP	_nextChar
 
 _add:
 	; else add if positive
-	ADD		EBX, EAX
-	JO		_error
+	ADD	EBX, EAX
+	JO	_error
 
 _nextChar:
 	; initiate next digit and loop
-	XOR		EAX, EAX
+	XOR	EAX, EAX
 	LODSB
 	LOOP	_convertLoop
 
 	; store validated number
-	MOV		EDI, [EBP+8]
-	MOV		[EDI], EBX
+	MOV	EDI, [EBP+8]
+	MOV	[EDI], EBX
 	
 	; restore & dereference
-	POP		ESI
-	POP		EDI
-	POP		ECX
-	POP		EBX
-	POP		EAX
-	RET		24
+	POP	ESI
+	POP	EDI
+	POP	ECX
+	POP	EBX
+	POP	EAX
+	RET	24
 
 ; signal error
 _error:
 	mGetString	[EBP+28], [EBP+20], [EBP+16], [EBP+12]
-	JMP		_validLoop
+	JMP	_validLoop
 
 ReadVal ENDP
 
@@ -329,38 +329,38 @@ WriteVal PROC
 	PUSH	ESI
 
 	; check sign
-	MOV		sign, '+'
-	MOV		EAX, [EBP+8]
-	CMP		EAX, 0
-	JGE		_revConvert
+	MOV	sign, '+'
+	MOV	EAX, [EBP+8]
+	CMP	EAX, 0
+	JGE	_revConvert
 
 	; add sign to output string if negative
-	MOV		sign, '-'
-	NEG		EAX
+	MOV	sign, '-'
+	NEG	EAX
 
 	; fill revStr w/ nums in reverse
 _revConvert:
-	LEA		ESI, revStr
-	MOV		ECX, 0
+	LEA	ESI, revStr
+	MOV	ECX, 0
 _revLoop:
-	MOV		EBX, 10
-	XOR		EDX, EDX
-	DIV		EBX
-	ADD		EDX, 48
-	MOV		[ESI], DL
-	INC		ESI
-	INC		ECX
-	CMP		EAX, 0
-	JNZ		_revLoop
+	MOV	EBX, 10
+	XOR	EDX, EDX
+	DIV	EBX
+	ADD	EDX, 48
+	MOV	[ESI], DL
+	INC	ESI
+	INC	ECX
+	CMP	EAX, 0
+	JNZ	_revLoop
 
 	; flip revString into numStr
-	DEC		ESI
-	LEA		EDI, numStr
+	DEC	ESI
+	LEA	EDI, numStr
 
 	; if neg, add sign first
-	CMP		sign, '-'
-	JNZ		_fwdLoop
-	MOV		AL, sign
+	CMP	sign, '-'
+	JNZ	_fwdLoop
+	MOV	AL, sign
 	STOSB
 
 	; fill numStr with numbers forward
@@ -372,21 +372,21 @@ _fwdLoop:
 	LOOP	_fwdLoop
 
 	; null terminate numStr
-	MOV		AL, 0
+	MOV	AL, 0
 	STOSB
 
 	; print numString
-	LEA		ESI, numStr
+	LEA	ESI, numStr
 	mDisplayString	ESI
 
 	; restore and dereference
-	POP		ESI
-	POP		EDX
-	POP		EDI
-	POP		ECX
-	POP		EBX
-	POP		EAX
-	RET		4
+	POP	ESI
+	POP	EDX
+	POP	EDI
+	POP	ECX
+	POP	EBX
+	POP	EAX
+	RET	4
 WriteVal ENDP
 
 
@@ -409,7 +409,7 @@ WriteVal ENDP
 CalcSum PROC
 	; prepare EBP for Base+Offset
 	PUSH	EBP
-	MOV		EBP, ESP
+	MOV	EBP, ESP
 
 	; save registers
 	PUSH	EAX
@@ -419,26 +419,26 @@ CalcSum PROC
 	PUSH	ESI
 
 	; init first value and prepare loop
-	MOV		ECX, [EBP+12]
-	MOV		EDI, [EBP+8]
-	MOV		ESI, [EBP+16]
+	MOV	ECX, [EBP+12]
+	MOV	EDI, [EBP+8]
+	MOV	ESI, [EBP+16]
 	LODSD
-	MOV		[EDI], EAX					; destination variable will hold tally
-	DEC		ECX
+	MOV	[EDI], EAX				; destination variable will hold tally
+	DEC	ECX
 
 _sumLoop:
 	LODSD
-	ADD		[EDI], EAX
+	ADD	[EDI], EAX
 	LOOP	_sumLoop
 
 	; restore registers and dereference stack
-	POP		ESI
-	POP		EDI
-	POP		ECX
-	POP		EBX
-	POP		EAX
-	POP		EBP
-	RET		12
+	POP	ESI
+	POP	EDI
+	POP	ECX
+	POP	EBX
+	POP	EAX
+	POP	EBP
+	RET	12
 CalcSum ENDP
 
 
